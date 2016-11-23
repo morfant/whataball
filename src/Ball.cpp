@@ -27,72 +27,31 @@
 
  */
 
-
-
-Ball::Ball(b2World* aWorld, float x, float y, bool isSuper)
+Ball::Ball(float x, float y, float r, bool isSuper)
 {
     
     superBall = isSuper;
-    
-    // Set Userdata
-    if(superBall){
-        ballUserData = SUPER_BALL;
-    }else{
-        ballUserData = BALL;
-    }
-    
-    mWorld = aWorld;
+//    isFinished = false;
+   
     posX = x;
     posY = y;
+    radius = r;
     
-    radius = 30.f;
+//    rectArr[i] = ofRectangle(posX, (posY - radius), rectSide, rectSide);
     
-    b2BodyDef myBodyDef;
-    
-    if (superBall) {
-        myBodyDef.type = b2_staticBody;
-    }else{
-        myBodyDef.type = b2_dynamicBody;
-    }
-    
-    myBodyDef.position.Set(_toWorldX(posX), _toWorldY(posY));
-    mBody = mWorld -> CreateBody(&myBodyDef);
-    
-    mBody->SetUserData((void*)ballUserData);
-    //    mBody->SetUserData(this);
+    posArr.push_back( ofPoint(x, (y - radius) ) );
+    stringArr.push_back("000");
     
     
-    b2CircleShape myCircleShape;
-    myCircleShape.m_p.Set(0, 0);
-    myCircleShape.m_radius = _toWorldScale(radius/2.f);
-    
-    b2FixtureDef myFixtureDef;
-    myFixtureDef.shape = &myCircleShape;
-    
-    if (superBall){
-        
-        myFixtureDef.density = 100.f;
-        myFixtureDef.restitution = 100.f;
-        myFixtureDef.friction = 1.f;
-        
-    }else{
-        
-        myFixtureDef.density = 0.1f;
-        myFixtureDef.restitution = 0.1f;
-        myFixtureDef.friction = 0.7f;
-    }
-    
-    myFixtureDef.filter.categoryBits = BALL_CATE_BIT;
-    myFixtureDef.filter.maskBits = BALL_MASK_BIT;
-    
-    mBody->CreateFixture(&myFixtureDef);
-    
-    
+//    circles.push_back(shared_ptr<ofxBox2dCircle>(new ofxBox2dCircle));
+//    circles.back().get()->setPhysics(3.0, 0.53, 0.1);
+//    circles.back().get()->setup(box2d.getWorld(), posX, posY, radius);
+//   
 }
 
 Ball::~Ball()
 {
-    mWorld->DestroyBody(mBody);
+    
 }
 
 // getter & setter
@@ -140,6 +99,33 @@ Ball::setY(float _posY)
     
 }
 
+void
+Ball::addText(string text){
+   
+    /*
+     <Get next position on circle>
+     
+     float x = r*cos(t) + h;
+     float y = r*sin(t) + k;
+    */
+    
+    cout << "addText()" << endl;
+    float the = ofDegToRad(DEG_MUL*curIdx);
+    posX = radius*cos(the) + oldPosX;
+    posY = radius*sin(the) + oldPosY;
+    posArr.push_back(ofPoint(posX, posY));
+    
+    stringArr.push_back(text);
+    
+    curIdx++;
+    
+}
+
+
+void
+Ball::addRect(){
+  
+}
 
 void
 Ball::renderAtBodyPosition()
@@ -168,6 +154,50 @@ Ball::update()
 void
 Ball::draw()
 {
+    
+    /*
+     string info = "";
+     info += "Press [c] for circles\n";
+     info += "Press [b] for blocks\n";
+     info += "Total Bodies: "+ofToString(box2d.getBodyCount())+"\n";
+     info += "Total Joints: "+ofToString(box2d.getJointCount())+"\n\n";
+     info += "FPS: "+ofToString(ofGetFrameRate(), 1)+"\n";
+     ofSetHexColor(0x444342);
+     ofDrawBitmapString(info, 30, 30);
+    */
+    
+    ofFill();
+    ofSetHexColor(0xf6c738);
+    cout << "arr size: " << stringArr.size() << endl;
+    
+//    for(vector<string>::iterator it = stringArr.begin();
+//        it != stringArr.end(); it++) {
+//
+//        ofSetHexColor(0x444342);
+//        cout << stringArr[i] << endl;
+//        cout << posArr[i].x << endl;
+//        cout << posArr[i].y << endl;
+//        
+//        ofDrawBitmapString(stringArr[i], posArr[i].x, posArr[i].y);
+//
+//    }
+//
+    if (stringArr.size() > 0) {
+        for (int i = 0; i < stringArr.size(); i++){
+            cout << "in a loop" << endl;
+            ofSetHexColor(0x444342);
+    //        cout << stringArr[i] << endl;
+    //        cout << posArr[i].x << endl;
+    //        cout << posArr[i].y << endl;
+            
+            ofDrawBitmapString(stringArr[i], posArr[i].x, posArr[i].y);
+        }
+    }
+//    circles[i].get()->draw();
+    
+    
+    // draw the ground
+//    box2d.drawGround();
     
     
     

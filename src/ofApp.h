@@ -3,11 +3,13 @@
 #include "ofMain.h"
 #include "ofxOsc.h"
 #include "ofxBox2d.h"
+#include "Ball.h"
 
 // listen on port 12345
 #define PORT 8000
 #define NUM_MSG_STRINGS 20
 #define CH_NUM 8
+#define BALL_NUM 3
 
 class ofApp : public ofBaseApp {
 public:
@@ -52,5 +54,7 @@ public:
 	vector   <shared_ptr<ofxBox2dRect> >   boxes;   // defalut box2d rects
     
     
-    
+    /* BALL */
+//    Ball* balls[BALL_NUM];
+    vector<Ball*> balls;
 };
