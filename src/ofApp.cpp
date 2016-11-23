@@ -5,8 +5,9 @@ void ofApp::setup(){
     
     /* BALL */
 //    for (int i = 0; i < balls.size(); i++){
-//        balls[i] = new Ball(100, 100, 30, false);
-//    }
+    for (int i = 0; i < BALL_NUM; i++){
+        balls[i] = NULL;
+    }
     
     /* OFXOSC */
     for (int i = 0; i < CH_NUM; i++){
@@ -69,16 +70,16 @@ void ofApp::update(){
             ch6, ch7, ch8: morogado (floppy, tape, tape)
         */
         
-        for (int i = 1; i < CH_NUM; i++){
+        for (int i = 0; i < CH_NUM; i++){
             if (m.getAddress() == oscAddrs[i]) {
                 oscRecvVal[i] = m.getArgAsFloat(0);
                 
-                if (balls[i%RECT_NUM] != NULL) {
-                    cout << "addText()" << endl;
-                    balls[i%RECT_NUM]->addText(std::to_string(oscRecvVal[i]));
+                if (balls[i%CH_NUM] != NULL) {
+//                    cout << "addText(): " << (i%CH_NUM) << endl;
+                    balls[i%CH_NUM]->addText(std::to_string(oscRecvVal[i]));
                 }
                 
-                cout << oscAddrs[i] << "-" << i << "-" << oscRecvVal[i] << endl;
+//                cout << oscAddrs[i] << "-" << i << "-" << oscRecvVal[i] << endl;
             } else {
                 // unrecognized message: display on the bottom of the screen
                 string msg_string;
@@ -169,7 +170,7 @@ void ofApp::update(){
 	}
     
     /* BALL */
-    for (int i = 0; i < balls.size(); i++){
+    for (int i = 0; i < BALL_NUM; i++){
         if (balls[i] != NULL) {
             balls[i]->update();
         }
@@ -182,19 +183,19 @@ void ofApp::update(){
 void ofApp::draw(){
     
     /* BALL */
-    for (vector<Ball*>::iterator it = balls.begin(); it != balls.end(); it++) {
-        (*it)->draw();
-    }
-
-//    for (int i = 0; balls.size(); i++){
-//        cout << "balls size: " << balls.size() << endl;
-//        
-//        if (balls[i] != NULL) {
-//            balls[i]->draw();
-//        }
+//    for (vector<Ball*>::iterator it = balls.begin(); it != balls.end(); it++) {
+//        (*it)->draw();
 //    }
-// 
 //
+    for (int i = 0; i < BALL_NUM; i++){
+//        cout << "balls size: " << balls.size() << endl;
+        
+        if (balls[i] != NULL) {
+            balls[i]->draw();
+        }
+    }
+ 
+
 //	for(int i=0; i<circles.size(); i++) {
 //		ofFill();
 //		ofSetHexColor(0xf6c738);
@@ -267,13 +268,11 @@ void ofApp::keyPressed(int key){
     
     
     if(key == '1'){
-        balls.push_back(new Ball(100, 100, 30, false));
+        balls[0] = new Ball(300, 100, RAD, false);
     } else if (key == '2') {
-        balls.push_back(new Ball(300, 100, 30, false));
-//        balls[1] = new Ball(300, 100, 30, false);
+        balls[1] = new Ball(600, 100, RAD, false);
     } else if (key == '3') {
-        balls.push_back(new Ball(500, 100, 30, false));
-//        balls[2] = new Ball(500, 100, 30, false);
+        balls[2] = new Ball(900, 300, RAD, false);
     }
     
 }

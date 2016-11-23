@@ -30,17 +30,27 @@
 Ball::Ball(float x, float y, float r, bool isSuper)
 {
     
+    radius[0] = 20;
+    radius[1] = 17;
+    radius[2] = 13;
+    radius[3] = 10;
+    radius[4] = 5;
+    
     superBall = isSuper;
 //    isFinished = false;
    
+    curRad = radius[0];
     posX = x;
-    posY = y;
-    radius = r;
+    posY = y - curRad;
+    oldPosX = posX;
+    oldPosY = posY;
     
 //    rectArr[i] = ofRectangle(posX, (posY - radius), rectSide, rectSide);
     
-    posArr.push_back( ofPoint(x, (y - radius) ) );
+    posArr.push_back( ofPoint(posX, posY) );
     stringArr.push_back("000");
+    
+    
     
     
 //    circles.push_back(shared_ptr<ofxBox2dCircle>(new ofxBox2dCircle));
@@ -88,15 +98,16 @@ Ball::getBody()
 }
 
 void
-Ball::setX(float _posX)
+Ball::setPos(ofPoint pos)
 {
-    
+    posX = pos.x;
+    posY = pos.y;
 }
 
+
 void
-Ball::setY(float _posY)
+Ball::setRadius(float r)
 {
-    
 }
 
 void
@@ -109,15 +120,43 @@ Ball::addText(string text){
      float y = r*sin(t) + k;
     */
     
-    cout << "addText()" << endl;
+//    cout << "addText()" << endl;
+    
+    if ((DEG_MUL*curIdx) >= 360) {
+        curIdx = 0;
+        
+        if (radIdx < (RAD_NUM - 1)) {
+//            oldPosY = oldPosY + (2*(radius[radIdx] - radius[radIdx+1]));
+            oldPosY = oldPosY + 20;
+        }
+        
+        radIdx++;
+        
+        if (radIdx > RAD_NUM){
+            radIdx = 0;
+        }
+        
+        cout << "radIdx: " << radIdx << endl;
+        curRad = radius[radIdx];
+
+    }
+    
     float the = ofDegToRad(DEG_MUL*curIdx);
-    posX = radius*cos(the) + oldPosX;
-    posY = radius*sin(the) + oldPosY;
+    posX = curRad*cos(the) + oldPosX;
+    posY = curRad*sin(the) + oldPosY;
+    
+    cout << "new X/Y: " << posX << " / " << posY << endl;
     posArr.push_back(ofPoint(posX, posY));
     
     stringArr.push_back(text);
+//    for (int i = 0; i < stringArr.size(); i++){
+//        cout << stringArr.at(i) << endl;
+//    }
     
     curIdx++;
+    
+    oldPosX = posX;
+    oldPosY = posY;
     
 }
 
@@ -137,7 +176,7 @@ Ball::renderAtBodyPosition()
     ofFill();
     ofPushMatrix();
     ofTranslate(_toPixelX(pos.x), _toPixelY(pos.y));
-    ofEllipse(0, 0, radius, radius);
+//    ofEllipse(0, 0, radius, radius);
     ofPopMatrix();
     ofPopStyle();
 }
@@ -168,7 +207,7 @@ Ball::draw()
     
     ofFill();
     ofSetHexColor(0xf6c738);
-    cout << "arr size: " << stringArr.size() << endl;
+//    cout << "arr size: " << stringArr.size() << endl;
     
 //    for(vector<string>::iterator it = stringArr.begin();
 //        it != stringArr.end(); it++) {
@@ -182,9 +221,9 @@ Ball::draw()
 //
 //    }
 //
-    if (stringArr.size() > 0) {
+//    if (stringArr.size() > 0) {
         for (int i = 0; i < stringArr.size(); i++){
-            cout << "in a loop" << endl;
+//            cout << "in a loop" << endl;
             ofSetHexColor(0x444342);
     //        cout << stringArr[i] << endl;
     //        cout << posArr[i].x << endl;
@@ -192,7 +231,7 @@ Ball::draw()
             
             ofDrawBitmapString(stringArr[i], posArr[i].x, posArr[i].y);
         }
-    }
+//    }
 //    circles[i].get()->draw();
     
     

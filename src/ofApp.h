@@ -10,6 +10,7 @@
 #define NUM_MSG_STRINGS 20
 #define CH_NUM 8
 #define BALL_NUM 3
+#define RAD 20 
 
 class ofApp : public ofBaseApp {
 public:
@@ -55,6 +56,7 @@ public:
     
     
     /* BALL */
-//    Ball* balls[BALL_NUM];
-    vector<Ball*> balls;
+    Ball* balls[BALL_NUM];
+//    vector<Ball*> balls;
+//    vector<vector<Ball*>> ballsArr;
 };
