@@ -2,10 +2,12 @@
 
 #include "ofMain.h"
 #include "ofxOsc.h"
+#include "ofxBox2d.h"
 
 // listen on port 12345
-#define PORT 12345
+#define PORT 8000
 #define NUM_MSG_STRINGS 20
+#define CH_NUM 8
 
 class ofApp : public ofBaseApp {
 public:
@@ -26,15 +28,29 @@ public:
     void dragEvent(ofDragInfo dragInfo);
     void gotMessage(ofMessage msg);
     
+    /* OFXOSC */
     ofTrueTypeFont font;
     ofxOscReceiver receiver;
     
     int current_msg_string;
     string msg_strings[NUM_MSG_STRINGS];
     float timers[NUM_MSG_STRINGS];
+    float oscRecvVal[CH_NUM];
+    string oscAddrs[CH_NUM];
     
     int mouseX, mouseY;
     string mouseButtonState;
     
     ofImage receivedImage;
+    
+    
+    
+    
+    /* OFXBOX2D */
+   	ofxBox2d                               box2d;   // the box2d world
+	vector   <shared_ptr<ofxBox2dCircle> > circles; // default box2d circles
+	vector   <shared_ptr<ofxBox2dRect> >   boxes;   // defalut box2d rects
+    
+    
+    
 };
