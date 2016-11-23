@@ -4,9 +4,8 @@
 void ofApp::setup(){
     
     /* BALL */
-//    for (int i = 0; i < balls.size(); i++){
     for (int i = 0; i < BALL_NUM; i++){
-        balls[i] = NULL;
+        curBalls[i] = NULL;
     }
     
     /* OFXOSC */
@@ -74,9 +73,11 @@ void ofApp::update(){
             if (m.getAddress() == oscAddrs[i]) {
                 oscRecvVal[i] = m.getArgAsFloat(0);
                 
-                if (balls[i%CH_NUM] != NULL) {
+                if (curBalls[i] != NULL) {
+//                if (curBalls.at(i) != NULL) {
 //                    cout << "addText(): " << (i%CH_NUM) << endl;
-                    balls[i%CH_NUM]->addText(std::to_string(oscRecvVal[i]));
+//                    balls.at(i%CH_NUM)->addText(std::to_string(oscRecvVal[i]));
+                    curBalls[i]->addText(std::to_string(oscRecvVal[i]));
                 }
                 
 //                cout << oscAddrs[i] << "-" << i << "-" << oscRecvVal[i] << endl;
@@ -170,12 +171,17 @@ void ofApp::update(){
 	}
     
     /* BALL */
-    for (int i = 0; i < BALL_NUM; i++){
-        if (balls[i] != NULL) {
+//    for (int i = 0; i < BALL_NUM; i++){
+//        if (balls[i] != NULL) {
+//            balls[i]->update();
+//        }
+//    }
+//
+    for (int i = 0; i < balls.size(); i++){
+//        if (balls[i] != NULL) {
             balls[i]->update();
-        }
+//        }
     }
- 
 }
 
 
@@ -187,15 +193,17 @@ void ofApp::draw(){
 //        (*it)->draw();
 //    }
 //
-    for (int i = 0; i < BALL_NUM; i++){
+//    for (int i = 0; i < BALL_NUM; i++){
+    for (int i = 0; i < balls.size(); i++){
 //        cout << "balls size: " << balls.size() << endl;
         
-        if (balls[i] != NULL) {
+//        if (balls[i] != NULL) {
             balls[i]->draw();
-        }
+//        }
     }
  
 
+    /* OFXBOX2D */
 //	for(int i=0; i<circles.size(); i++) {
 //		ofFill();
 //		ofSetHexColor(0xf6c738);
@@ -252,7 +260,6 @@ void ofApp::keyPressed(int key){
 		float r = ofRandom(4, 20);
 		circles.push_back(shared_ptr<ofxBox2dCircle>(new ofxBox2dCircle));
 		circles.back().get()->setPhysics(3.0, 0.53, 0.1);
-
 		circles.back().get()->setup(box2d.getWorld(), mx, my, r);
 	}
 	
@@ -268,11 +275,22 @@ void ofApp::keyPressed(int key){
     
     
     if(key == '1'){
-        balls[0] = new Ball(300, 100, RAD, false);
+//        balls[0] = new Ball(300, 100, RAD, false);
+
+//        if (curBalls[0] == NULL) {
+            Ball* aBall = new Ball(&box2d, 300, 100, RAD, false);
+            curBalls[0] = aBall;
+            balls.push_back(aBall);
+//        }
+        
     } else if (key == '2') {
-        balls[1] = new Ball(600, 100, RAD, false);
+        Ball* aBall = new Ball(&box2d, 600, 100, RAD, false);
+        balls.push_back(aBall);
+//        balls[1] = new Ball(600, 100, RAD, false);
     } else if (key == '3') {
-        balls[2] = new Ball(900, 300, RAD, false);
+        Ball* aBall = new Ball(&box2d, 900, 100, RAD, false);
+        balls.push_back(aBall);
+//        balls[2] = new Ball(900, 300, RAD, false);
     }
     
 }

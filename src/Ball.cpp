@@ -11,46 +11,38 @@
 
 
 // ----Birth & Death----
-
-/*
- 
- // in your header files
- vector <shared_ptr<ofxBox2dCircle> > circles;
- 
- // now add a circle to the vector
- shared_ptr<ofxBox2dCircle> circle = shared_ptr<ofxBox2dCircle>(new ofxBox2dCircle);
- 
- // to grab the pointer you use the get() function of shared_ptr (std::shared_ptr)
- circle.get()->setPhysics(3.0, 0.53, 0.1);
- circle.get()->setup(box2d.getWorld(), 100, 100, 10);
- circles.push_back(circle);
-
- */
-
-Ball::Ball(float x, float y, float r, bool isSuper)
+Ball::Ball(ofxBox2d* w, float x, float y, float r, bool isSuper)
 {
-    
-    radius[0] = 20;
-    radius[1] = 17;
-    radius[2] = 13;
-    radius[3] = 10;
-    radius[4] = 5;
+   
+    mWorld = w;
+    radius[0] = RAD;
+    radius[1] = (RAD - 60);
+    radius[2] = (RAD - 100);
+    radius[3] = (RAD - 130);
+    radius[4] = (RAD - 150);
     
     superBall = isSuper;
 //    isFinished = false;
+    
+    cx = x;
+    cy = y;
    
-    curRad = radius[0];
+    curRad = radius[0]/2;
     posX = x;
     posY = y - curRad;
     oldPosX = posX;
     oldPosY = posY;
-    
+   
 //    rectArr[i] = ofRectangle(posX, (posY - radius), rectSide, rectSide);
     
     posArr.push_back( ofPoint(posX, posY) );
     stringArr.push_back("000");
     
-    
+    /* make box2d body */
+    mBody = new ofxBox2dCircle;
+//    mBody->setPhysics(0.0, 0.53, 0.1); // Density 0 means, static body
+    mBody->setPhysics(3.0, 0.53, 0.1); // Density 0 means, static body
+    mBody->setup(mWorld->getWorld(), cx, cy, curRad);
     
     
 //    circles.push_back(shared_ptr<ofxBox2dCircle>(new ofxBox2dCircle));
@@ -87,13 +79,13 @@ Ball::getIsSuper()
 b2World*
 Ball::getWorld()
 {
-    return mWorld;
+//    return mWorld;
 }
 
 b2Body*
 Ball::getBody()
 {
-    return mBody;
+//    return mBody;
     
 }
 
@@ -115,9 +107,8 @@ Ball::addText(string text){
    
     /*
      <Get next position on circle>
-     
-     float x = r*cos(t) + h;
-     float y = r*sin(t) + k;
+     int newX = (int)(center.X + radius * Math.Cos(angle));
+     int newY = (int)(center.Y + radius * Math.Sin(angle));
     */
     
 //    cout << "addText()" << endl;
@@ -127,25 +118,27 @@ Ball::addText(string text){
         
         if (radIdx < (RAD_NUM - 1)) {
 //            oldPosY = oldPosY + (2*(radius[radIdx] - radius[radIdx+1]));
-            oldPosY = oldPosY + 20;
+//            oldPosY = oldPosY + 20;
         }
         
         radIdx++;
         
         if (radIdx > RAD_NUM){
             radIdx = 0;
+            curIdx = 0;
         }
         
         cout << "radIdx: " << radIdx << endl;
-        curRad = radius[radIdx];
+        curRad = radius[radIdx]/2;
 
     }
     
     float the = ofDegToRad(DEG_MUL*curIdx);
-    posX = curRad*cos(the) + oldPosX;
-    posY = curRad*sin(the) + oldPosY;
+
+    posX = cx + curRad*cos(the);
+    posY = cy + curRad*sin(the);
     
-    cout << "new X/Y: " << posX << " / " << posY << endl;
+//    cout << "new X/Y: " << posX << " / " << posY << endl;
     posArr.push_back(ofPoint(posX, posY));
     
     stringArr.push_back(text);
@@ -169,16 +162,16 @@ Ball::addRect(){
 void
 Ball::renderAtBodyPosition()
 {
-    b2Vec2 pos = mBody->GetPosition();
-    
-    ofPushStyle();
-    ofSetColor(250, 250, 0); // Set ball color
-    ofFill();
-    ofPushMatrix();
-    ofTranslate(_toPixelX(pos.x), _toPixelY(pos.y));
-//    ofEllipse(0, 0, radius, radius);
-    ofPopMatrix();
-    ofPopStyle();
+//    b2Vec2 pos = mBody->GetPosition();
+//    
+//    ofPushStyle();
+//    ofSetColor(250, 250, 0); // Set ball color
+//    ofFill();
+//    ofPushMatrix();
+//    ofTranslate(_toPixelX(pos.x), _toPixelY(pos.y));
+////    ofEllipse(0, 0, radius, radius);
+//    ofPopMatrix();
+//    ofPopStyle();
 }
 
 
@@ -186,7 +179,7 @@ Ball::renderAtBodyPosition()
 void
 Ball::update()
 {
-    
+ 
 }
 
 
@@ -205,39 +198,37 @@ Ball::draw()
      ofDrawBitmapString(info, 30, 30);
     */
     
-    ofFill();
-    ofSetHexColor(0xf6c738);
-//    cout << "arr size: " << stringArr.size() << endl;
+//    for(int i=0; i<circles.size(); i++) {
+
+//		ofFill();
+//		ofSetHexColor(0xf6c738);
+
+        mBody->draw();
+//		circles[i].get()->draw();
+        
+//        ofFill();
+//        ofSetHexColor(0xf6c738);
+
+        ofPushMatrix();
+//        ofPoint box2dPos = circles[i].get()->getB2DPosition();
+        ofPoint box2dPos = mBody->getPosition();
+//        ofPoint box2dPos = mBody->getB2DPosition();
+        cout << "box2dpos X/Y: " << box2dPos.x << " / " << box2dPos.y << endl;
+        
+        ofTranslate(box2dPos.x, box2dPos.y);
     
-//    for(vector<string>::iterator it = stringArr.begin();
-//        it != stringArr.end(); it++) {
-//
-//        ofSetHexColor(0x444342);
-//        cout << stringArr[i] << endl;
-//        cout << posArr[i].x << endl;
-//        cout << posArr[i].y << endl;
-//        
-//        ofDrawBitmapString(stringArr[i], posArr[i].x, posArr[i].y);
-//
-//    }
-//
-//    if (stringArr.size() > 0) {
         for (int i = 0; i < stringArr.size(); i++){
-//            cout << "in a loop" << endl;
+//            ofFill();
             ofSetHexColor(0x444342);
-    //        cout << stringArr[i] << endl;
-    //        cout << posArr[i].x << endl;
-    //        cout << posArr[i].y << endl;
-            
-            ofDrawBitmapString(stringArr[i], posArr[i].x, posArr[i].y);
+            ofDrawBitmapString(stringArr[i], posArr[i].x - cx, posArr[i].y - cy);
+//            ofDrawCircle(posArr[i].x - cx, posArr[i].y - cy, 2);
         }
-//    }
-//    circles[i].get()->draw();
     
-    
-    // draw the ground
-//    box2d.drawGround();
-    
+        ofPopMatrix();
+     
+//	}
+	
+   
     
     
 }

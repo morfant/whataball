@@ -601,8 +601,8 @@
 		E4B69E1C0A3A1BDC003C02F2 /* src */ = {
 			isa = PBXGroup;
 			children = (
-				67989E011DE542A4006079C3 /* class */,
 				E4B69E1D0A3A1BDC003C02F2 /* main.cpp */,
+				67989E011DE542A4006079C3 /* class */,
 				E4B69E1E0A3A1BDC003C02F2 /* ofApp.cpp */,
 				E4B69E1F0A3A1BDC003C02F2 /* ofApp.h */,
 				67989E051DE5459D006079C3 /* convertFunc.h */,
