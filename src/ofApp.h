@@ -57,5 +57,6 @@ public:
     /* BALL */
     Ball* curBalls[BALL_NUM];
     vector<Ball*> balls;
+    
 //    vector<vector<Ball*>> ballsArr;
 };

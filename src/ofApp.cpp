@@ -275,8 +275,6 @@ void ofApp::keyPressed(int key){
     
     
     if(key == '1'){
-//        balls[0] = new Ball(300, 100, RAD, false);
-
 //        if (curBalls[0] == NULL) {
             Ball* aBall = new Ball(&box2d, 300, 100, RAD, false);
             curBalls[0] = aBall;
@@ -285,14 +283,42 @@ void ofApp::keyPressed(int key){
         
     } else if (key == '2') {
         Ball* aBall = new Ball(&box2d, 600, 100, RAD, false);
+        curBalls[1] = aBall;
         balls.push_back(aBall);
-//        balls[1] = new Ball(600, 100, RAD, false);
     } else if (key == '3') {
         Ball* aBall = new Ball(&box2d, 900, 100, RAD, false);
+        curBalls[2] = aBall;
         balls.push_back(aBall);
-//        balls[2] = new Ball(900, 300, RAD, false);
     }
     
+    if (key == 'f'){
+        // change all strings to 'future of ' temporary
+        for (vector<Ball*>::iterator it = balls.begin();
+             it != balls.end(); it++) {
+            (*it)->switchText("future of");
+        }
+    }
+    
+    if (key == 'g'){
+        for (vector<Ball*>::iterator it = balls.begin();
+             it != balls.end(); it++) {
+            (*it)->revertText();
+        }
+    }
+    
+    if (key == 'q') {
+        cout << "applyPhysics(TRUE)" << endl;
+        curBalls[0]->applyPhysics(TRUE);
+//        curBalls[1]->applyPhysics(TRUE);
+//        curBalls[2]->applyPhysics(TRUE);
+    }
+    
+    if (key == 'a') {
+        cout << "applyPhysics(FALSE)" << endl;
+        curBalls[0]->applyPhysics(FALSE);
+//        curBalls[1]->applyPhysics(FALSE);
+//        curBalls[2]->applyPhysics(FALSE);
+    }
 }
 
 //--------------------------------------------------------------

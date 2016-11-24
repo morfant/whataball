@@ -40,15 +40,11 @@ Ball::Ball(ofxBox2d* w, float x, float y, float r, bool isSuper)
     
     /* make box2d body */
     mBody = new ofxBox2dCircle;
+    // Density/Bounce/Friction,
 //    mBody->setPhysics(0.0, 0.53, 0.1); // Density 0 means, static body
-    mBody->setPhysics(3.0, 0.53, 0.1); // Density 0 means, static body
+//    mBody->setPhysics(1.0, 0.83, 0.1); // Density 0 means, static body
+    mBody->setPhysics(0.0, PHYSICS_BOUNCE, PHYSICS_FRICTION); // Density 0 means, static body
     mBody->setup(mWorld->getWorld(), cx, cy, curRad);
-    
-    
-//    circles.push_back(shared_ptr<ofxBox2dCircle>(new ofxBox2dCircle));
-//    circles.back().get()->setPhysics(3.0, 0.53, 0.1);
-//    circles.back().get()->setup(box2d.getWorld(), posX, posY, radius);
-//   
 }
 
 Ball::~Ball()
@@ -142,6 +138,7 @@ Ball::addText(string text){
     posArr.push_back(ofPoint(posX, posY));
     
     stringArr.push_back(text);
+    stringArrOrigin.push_back(text);
 //    for (int i = 0; i < stringArr.size(); i++){
 //        cout << stringArr.at(i) << endl;
 //    }
@@ -187,48 +184,61 @@ void
 Ball::draw()
 {
     
-    /*
-     string info = "";
-     info += "Press [c] for circles\n";
-     info += "Press [b] for blocks\n";
-     info += "Total Bodies: "+ofToString(box2d.getBodyCount())+"\n";
-     info += "Total Joints: "+ofToString(box2d.getJointCount())+"\n\n";
-     info += "FPS: "+ofToString(ofGetFrameRate(), 1)+"\n";
-     ofSetHexColor(0x444342);
-     ofDrawBitmapString(info, 30, 30);
-    */
+    mBody->draw();
     
-//    for(int i=0; i<circles.size(); i++) {
-
-//		ofFill();
-//		ofSetHexColor(0xf6c738);
-
-        mBody->draw();
-//		circles[i].get()->draw();
-        
 //        ofFill();
 //        ofSetHexColor(0xf6c738);
 
-        ofPushMatrix();
-//        ofPoint box2dPos = circles[i].get()->getB2DPosition();
-        ofPoint box2dPos = mBody->getPosition();
+    ofPushMatrix();
+    ofPoint box2dPos = mBody->getPosition();
 //        ofPoint box2dPos = mBody->getB2DPosition();
-        cout << "box2dpos X/Y: " << box2dPos.x << " / " << box2dPos.y << endl;
-        
-        ofTranslate(box2dPos.x, box2dPos.y);
+    float box2dAngle = mBody->getRotation();
+//        cout << "box2dpos X/Y: " << box2dPos.x << " / " << box2dPos.y << endl;
     
-        for (int i = 0; i < stringArr.size(); i++){
+    ofTranslate(box2dPos.x, box2dPos.y);
+    ofRotate(box2dAngle);
+
+    for (int i = 0; i < stringArr.size(); i++){
 //            ofFill();
-            ofSetHexColor(0x444342);
-            ofDrawBitmapString(stringArr[i], posArr[i].x - cx, posArr[i].y - cy);
+        ofSetHexColor(0x444342);
+        ofDrawBitmapString(stringArr[i], posArr[i].x - cx, posArr[i].y - cy);
 //            ofDrawCircle(posArr[i].x - cx, posArr[i].y - cy, 2);
-        }
-    
-        ofPopMatrix();
-     
-//	}
-	
+    }
+
+    ofPopMatrix();
+ 
+
    
     
+    
+}
+
+void
+Ball::switchText(string text)
+{
+    for (int i = 0; i < stringArr.size(); i++){
+        stringArr[i] = text;
+    }
+    
+}
+
+
+void
+Ball::revertText()
+{
+    stringArrCopy = stringArrOrigin;
+    stringArr.swap(stringArrCopy);
+}
+
+
+void
+Ball::applyPhysics(bool b)
+{
+    if (b) {
+        mBody->setPhysics(1.0, PHYSICS_BOUNCE, PHYSICS_FRICTION);
+        cout << mBody->getPhysics() << endl;
+    } else {
+        mBody->setPhysics(0.0, PHYSICS_BOUNCE, PHYSICS_FRICTION);
+    }
     
 }
