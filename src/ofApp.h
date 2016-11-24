@@ -6,10 +6,13 @@
 #include "Ball.h"
 
 // listen on port 12345
-#define PORT 8000
+#define OSC_RECV_PORT 8000
 #define NUM_MSG_STRINGS 20
-#define CH_NUM 3
-#define BALL_NUM 3
+//#define CH_NUM 8
+#define CH_NUM 9
+#define BALL_NUM 3 //Ball holder num
+#define LOUD_LEVEL 0.8
+#define REALTIME 0
 
 class ofApp : public ofBaseApp {
 public:
@@ -30,6 +33,10 @@ public:
     void dragEvent(ofDragInfo dragInfo);
     void gotMessage(ofMessage msg);
     
+    /* BASIC STEUP */
+    ofPoint windowPosition;
+    bool infoDisplay = false;
+    
     /* OFXOSC */
     ofTrueTypeFont font;
     ofxOscReceiver receiver;
@@ -39,6 +46,7 @@ public:
     float timers[NUM_MSG_STRINGS];
     float oscRecvVal[CH_NUM];
     string oscAddrs[CH_NUM];
+    float oscRecvThr[BALL_NUM];
     
     int mouseX, mouseY;
     string mouseButtonState;

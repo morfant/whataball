@@ -21,9 +21,6 @@ Ball::Ball(ofxBox2d* w, float x, float y, float r, bool isSuper)
     radius[3] = (RAD - 130);
     radius[4] = (RAD - 150);
     
-    superBall = isSuper;
-//    isFinished = false;
-    
     cx = x;
     cy = y;
    
@@ -43,7 +40,7 @@ Ball::Ball(ofxBox2d* w, float x, float y, float r, bool isSuper)
     // Density/Bounce/Friction,
 //    mBody->setPhysics(0.0, 0.53, 0.1); // Density 0 means, static body
 //    mBody->setPhysics(1.0, 0.83, 0.1); // Density 0 means, static body
-    mBody->setPhysics(0.0, PHYSICS_BOUNCE, PHYSICS_FRICTION); // Density 0 means, static body
+    mBody->setPhysics(1.0, PHYSICS_BOUNCE, PHYSICS_FRICTION); // Density 0 means, static body
     mBody->setup(mWorld->getWorld(), cx, cy, curRad);
 }
 
@@ -63,12 +60,6 @@ float
 Ball::getY()
 {
     return posY;
-}
-
-bool
-Ball::getIsSuper()
-{
-    return superBall;
 }
 
 
@@ -122,9 +113,10 @@ Ball::addText(string text){
         if (radIdx > RAD_NUM){
             radIdx = 0;
             curIdx = 0;
+            cycleFin = true;
         }
         
-        cout << "radIdx: " << radIdx << endl;
+//        cout << "radIdx: " << radIdx << endl;
         curRad = radius[radIdx]/2;
 
     }
@@ -135,10 +127,18 @@ Ball::addText(string text){
     posY = cy + curRad*sin(the);
     
 //    cout << "new X/Y: " << posX << " / " << posY << endl;
-    posArr.push_back(ofPoint(posX, posY));
     
-    stringArr.push_back(text);
-    stringArrOrigin.push_back(text);
+    if (!cycleFin) {
+        posArr.push_back(ofPoint(posX, posY));
+        stringArr.push_back(text);
+        stringArrOrigin.push_back(text);
+    } else {
+        int idx = (radIdx * 36) + curIdx;
+        stringArr[idx] = text;
+        stringArrOrigin[idx] = text;
+    }
+    
+
 //    for (int i = 0; i < stringArr.size(); i++){
 //        cout << stringArr.at(i) << endl;
 //    }
@@ -185,9 +185,6 @@ Ball::draw()
 {
     
     mBody->draw();
-    
-//        ofFill();
-//        ofSetHexColor(0xf6c738);
 
     ofPushMatrix();
     ofPoint box2dPos = mBody->getPosition();
@@ -199,8 +196,10 @@ Ball::draw()
     ofRotate(box2dAngle);
 
     for (int i = 0; i < stringArr.size(); i++){
-//            ofFill();
-        ofSetHexColor(0x444342);
+        
+        //text color
+//        ofSetHexColor(0x444342);
+        ofSetHexColor(0xffffff);
         ofDrawBitmapString(stringArr[i], posArr[i].x - cx, posArr[i].y - cy);
 //            ofDrawCircle(posArr[i].x - cx, posArr[i].y - cy, 2);
     }
@@ -236,9 +235,27 @@ Ball::applyPhysics(bool b)
 {
     if (b) {
         mBody->setPhysics(1.0, PHYSICS_BOUNCE, PHYSICS_FRICTION);
-        cout << mBody->getPhysics() << endl;
+//        cout << mBody->getPhysics() << endl;
     } else {
         mBody->setPhysics(0.0, PHYSICS_BOUNCE, PHYSICS_FRICTION);
     }
     
 }
+
+void
+Ball::eraseText(float interval)
+{
+    float curTime = ofGetElapsedTimeMillis();
+    while(stringArr.size()) {
+        if ((ofGetElapsedTimeMillis() - curTime) > interval) {
+            stringArr.pop_back();
+            stringArrOrigin.pop_back();
+//            stringArrCopy.pop_back();
+//            posArr.pop_back();
+            curTime = ofGetElapsedTimeMillis();
+        }
+    }
+    
+}
+
+

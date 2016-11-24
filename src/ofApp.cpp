@@ -3,21 +3,47 @@
 //--------------------------------------------------------------
 void ofApp::setup(){
     
+    /* basic steup */
+    
+//    //Set projection width / height
+//    int pjW = 1600;
+//    int pjH = 900;
+//    
+//    float winPosX = (pjW - ofGetWidth())/2.f;
+//    float winPosY = (pjH - ofGetHeight())/2.f;
+//    
+    if (REALTIME){
+        cout << "REALTIME!" << endl;
+        windowPosition = ofPoint(1440, 0);
+        ofSetWindowPosition(windowPosition.x, windowPosition.y);
+        ofToggleFullscreen();
+        infoDisplay = false;
+    }else{
+        cout << "NOT REALTIME!" << endl;
+        windowPosition = ofPoint(0, 0);
+        ofSetWindowPosition(windowPosition.x, windowPosition.y);
+        infoDisplay = true;
+    }
+    
     /* BALL */
     for (int i = 0; i < BALL_NUM; i++){
         curBalls[i] = NULL;
     }
     
     /* OFXOSC */
+    oscRecvThr[0] = 0.3;
+    oscRecvThr[1] = 0.3;
+    oscRecvThr[2] = 0.3;
+    
     for (int i = 0; i < CH_NUM; i++){
         oscRecvVal[i] = 0;
         oscAddrs[i] = "/ch" + std::to_string(i);
 //        cout << oscAddrs[i] << endl;
     }
     
-	// listen on the given port
-	cout << "listening for osc messages on port " << PORT << "\n";
-	receiver.setup(PORT);
+	// listen on the given OSC_RECV_PORT
+	cout << "listening for osc messages on OSC_RECV_PORT " << OSC_RECV_PORT << "\n";
+	receiver.setup(OSC_RECV_PORT);
 	current_msg_string = 0;
 
     
@@ -71,13 +97,34 @@ void ofApp::update(){
         
         for (int i = 0; i < CH_NUM; i++){
             if (m.getAddress() == oscAddrs[i]) {
-                oscRecvVal[i] = m.getArgAsFloat(0);
+//                oscRecvVal[i] = m.getArgAsFloat(0);
+                oscRecvVal[i%3] = m.getArgAsFloat(0);
+//                cout << oscRecvVal[i%3] << endl;
                 
-                if (curBalls[i] != NULL) {
+                if (curBalls[i%3] != NULL) {
+//                if (curBalls[i] != NULL) {
 //                if (curBalls.at(i) != NULL) {
 //                    cout << "addText(): " << (i%CH_NUM) << endl;
 //                    balls.at(i%CH_NUM)->addText(std::to_string(oscRecvVal[i]));
-                    curBalls[i]->addText(std::to_string(oscRecvVal[i]));
+//                    curBalls[i]->addText(std::to_string(oscRecvVal[i]));
+                    if (oscRecvVal[i%3] > oscRecvThr[i%3]){
+                        curBalls[i%3]->addText(std::to_string(oscRecvVal[i%3]));
+                        
+//                        if (oscRecvVal[i%3] > LOUD_LEVEL) {
+//                            // switch text
+//                            for (vector<Ball*>::iterator it = balls.begin(); it != balls.end(); it++) {
+//                                (*it)->switchText("future of");
+//                            }
+//                        }
+//                        
+                        // revert text normally.
+//                        for (vector<Ball*>::iterator it = balls.begin(); it != balls.end(); it++) {
+//                            (*it)->revertText();
+//                        }
+//                        
+                    };
+                     
+                   
                 }
                 
 //                cout << oscAddrs[i] << "-" << i << "-" << oscRecvVal[i] << endl;
@@ -188,49 +235,35 @@ void ofApp::update(){
 //--------------------------------------------------------------
 void ofApp::draw(){
     
-    /* BALL */
-//    for (vector<Ball*>::iterator it = balls.begin(); it != balls.end(); it++) {
-//        (*it)->draw();
-//    }
-//
-//    for (int i = 0; i < BALL_NUM; i++){
-    for (int i = 0; i < balls.size(); i++){
-//        cout << "balls size: " << balls.size() << endl;
-        
-//        if (balls[i] != NULL) {
-            balls[i]->draw();
-//        }
-    }
- 
 
     /* OFXBOX2D */
-//	for(int i=0; i<circles.size(); i++) {
-//		ofFill();
-//		ofSetHexColor(0xf6c738);
-//		circles[i].get()->draw();
-//	}
-//	
-//	for(int i=0; i<boxes.size(); i++) {
-//		ofFill();
-//		ofSetHexColor(0xBF2545);
-//		boxes[i].get()->draw();
-//	}
-//
 	// draw the ground
 	box2d.drawGround();
 	
-	string info = "";
-	info += "Press [c] for circles\n";
-	info += "Press [b] for blocks\n";
-	info += "Total Bodies: "+ofToString(box2d.getBodyCount())+"\n";
-	info += "Total Joints: "+ofToString(box2d.getJointCount())+"\n\n";
-	info += "FPS: "+ofToString(ofGetFrameRate(), 1)+"\n";
-	ofSetHexColor(0x444342);
-	ofDrawBitmapString(info, 30, 30);
+    
+    /* info display */
+    if (infoDisplay) {
+        string info = "";
+        info += "Press [c] for circles\n";
+        info += "Press [b] for blocks\n";
+        info += "Total Bodies: "+ofToString(box2d.getBodyCount())+"\n";
+        info += "Total Joints: "+ofToString(box2d.getJointCount())+"\n\n";
+        info += "FPS: "+ofToString(ofGetFrameRate(), 1)+"\n";
+        ofSetHexColor(0xff1111);
+        ofDrawBitmapString(info, 30, 30);
+    }
+    
+    /* BALL */
+//    ofSetHexColor(0x444342);
+    //circle color
+    ofSetHexColor(0xffffff);
+    for (int i = 0; i < balls.size(); i++){
+        balls[i]->draw();
+    }
     
     /* OSC */
 //	string buf;
-//	buf = "listening for osc messages on port" + ofToString(PORT);
+//	buf = "listening for osc messages on OSC_RECV_PORT" + ofToString(OSC_RECV_PORT);
 //	ofDrawBitmapString(buf, 10, 20);
 //    
 //    if(receivedImage.getWidth() > 0){
@@ -319,6 +352,61 @@ void ofApp::keyPressed(int key){
 //        curBalls[1]->applyPhysics(FALSE);
 //        curBalls[2]->applyPhysics(FALSE);
     }
+    
+    /* set oscRecvThr */
+    if (key == 'p') {
+        if (oscRecvThr[2] <= 0.98){
+            oscRecvThr[2]+=0.02;
+            cout << "oscRecvThr[2]: " << oscRecvThr[2] << endl;
+        }
+    }
+    
+    if (key == 'l') {
+        if (oscRecvThr[2] >= 0.02){
+            oscRecvThr[2]-=0.02;
+            cout << "oscRecvThr[2]: " << oscRecvThr[2] << endl;
+        }
+    }
+    
+    if (key == 'o') {
+        if (oscRecvThr[1] <= 0.98){
+            oscRecvThr[1]+=0.02;
+            cout << "oscRecvThr[1]: " << oscRecvThr[1] << endl;
+        }
+    }
+    
+    if (key == 'k') {
+        if (oscRecvThr[1] >= 0.02){
+            oscRecvThr[1]-=0.02;
+            cout << "oscRecvThr[1]: " << oscRecvThr[1] << endl;
+        }
+    }
+    
+    if (key == 'i') {
+        if (oscRecvThr[0] <= 0.98){
+            oscRecvThr[0]+=0.02;
+            cout << "oscRecvThr[0]: " << oscRecvThr[0] << endl;
+        }
+    }
+    
+    if (key == 'j') {
+        if (oscRecvThr[0] >= 0.02){
+            oscRecvThr[0]-=0.02;
+            cout << "oscRecvThr[0]: " << oscRecvThr[0] << endl;
+        }
+    }
+    
+    /* erase */
+    if (key == 'r') {
+         for (vector<Ball*>::iterator it = balls.begin(); it != balls.end(); it++) {
+             oscRecvThr[0] = 1;
+             oscRecvThr[1] = 1;
+             oscRecvThr[2] = 1;
+             
+            (*it)->eraseText(100);
+        }
+    }
+    
 }
 
 //--------------------------------------------------------------
