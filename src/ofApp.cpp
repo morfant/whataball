@@ -88,6 +88,10 @@ void ofApp::update(){
 		ofxOscMessage m;
 		receiver.getNextMessage(m);
         
+        if (!REALTIME) {
+            cout << "osc recv: " << m.getArgAsFloat(0) << endl;
+        }
+        
         /*
             ch0: teum 
             ch1: bae
