@@ -12,7 +12,7 @@
 #define CH_NUM 9
 #define BALL_NUM 3 //Ball holder num
 #define LOUD_LEVEL 0.8
-#define REALTIME 0
+#define REALTIME 1
 
 class ofApp : public ofBaseApp {
 public:
@@ -52,7 +52,6 @@ public:
     string mouseButtonState;
     
     ofImage receivedImage;
-    
     
     
     

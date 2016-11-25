@@ -31,9 +31,9 @@ void ofApp::setup(){
     }
     
     /* OFXOSC */
-    oscRecvThr[0] = 0.3;
-    oscRecvThr[1] = 0.3;
-    oscRecvThr[2] = 0.3;
+    oscRecvThr[0] = 0.02;
+    oscRecvThr[1] = 0.04;
+    oscRecvThr[2] = 0.01;
     
     for (int i = 0; i < CH_NUM; i++){
         oscRecvVal[i] = 0;
@@ -89,11 +89,11 @@ void ofApp::update(){
 		receiver.getNextMessage(m);
         
         /*
-            ch1: Not using
-            ch2, ch3: linear
-            ch4, ch5: teum
-            ch6, ch7, ch8: morogado (floppy, tape, tape)
+            ch0: teum 
+            ch1: bae
+            ch2: linear 
         */
+        
         
         for (int i = 0; i < CH_NUM; i++){
             if (m.getAddress() == oscAddrs[i]) {
@@ -254,9 +254,15 @@ void ofApp::draw(){
     }
     
     /* BALL */
-//    ofSetHexColor(0x444342);
+    
     //circle color
-    ofSetHexColor(0xffffff);
+//    if (colorGray) {
+//        ofSetHexColor(0x444342);
+//        
+//    } else {
+//        ofSetHexColor(0xffffff);
+//    }
+    
     for (int i = 0; i < balls.size(); i++){
         balls[i]->draw();
     }
@@ -289,11 +295,22 @@ void ofApp::keyPressed(int key){
     float mx = ofGetMouseX();
     float my = ofGetMouseY();
     
+    /* set color */
 	if(key == 'c') {
-		float r = ofRandom(4, 20);
-		circles.push_back(shared_ptr<ofxBox2dCircle>(new ofxBox2dCircle));
-		circles.back().get()->setPhysics(3.0, 0.53, 0.1);
-		circles.back().get()->setup(box2d.getWorld(), mx, my, r);
+        for (vector<Ball*>::iterator it = balls.begin();
+             it != balls.end(); it++) {
+             (*it)->setColor(0xffffff);
+        }
+        cout << "setColor ffffff" << endl;
+	}
+    
+    if(key == 'v') {
+        for (vector<Ball*>::iterator it = balls.begin();
+             it != balls.end(); it++) {
+             (*it)->setColor(0x444342);
+        }
+        
+        cout << "setColor 444342" << endl;
 	}
 	
 	if(key == 'b') {
@@ -310,16 +327,19 @@ void ofApp::keyPressed(int key){
     if(key == '1'){
 //        if (curBalls[0] == NULL) {
             Ball* aBall = new Ball(&box2d, 300, 100, RAD, false);
+//            Ball* aBall = new Ball(&box2d, 900, 100, RAD, false);
             curBalls[0] = aBall;
             balls.push_back(aBall);
 //        }
         
     } else if (key == '2') {
         Ball* aBall = new Ball(&box2d, 600, 100, RAD, false);
+//        Ball* aBall = new Ball(&box2d, 300, 100, RAD, false);
         curBalls[1] = aBall;
         balls.push_back(aBall);
     } else if (key == '3') {
         Ball* aBall = new Ball(&box2d, 900, 100, RAD, false);
+//        Ball* aBall = new Ball(&box2d, 600, 100, RAD, false);
         curBalls[2] = aBall;
         balls.push_back(aBall);
     }
@@ -356,42 +376,42 @@ void ofApp::keyPressed(int key){
     /* set oscRecvThr */
     if (key == 'p') {
         if (oscRecvThr[2] <= 0.98){
-            oscRecvThr[2]+=0.02;
+            oscRecvThr[2]+=0.01;
             cout << "oscRecvThr[2]: " << oscRecvThr[2] << endl;
         }
     }
     
     if (key == 'l') {
-        if (oscRecvThr[2] >= 0.02){
-            oscRecvThr[2]-=0.02;
+        if (oscRecvThr[2] >= 0.01){
+            oscRecvThr[2]-=0.01;
             cout << "oscRecvThr[2]: " << oscRecvThr[2] << endl;
         }
     }
     
     if (key == 'o') {
         if (oscRecvThr[1] <= 0.98){
-            oscRecvThr[1]+=0.02;
+            oscRecvThr[1]+=0.01;
             cout << "oscRecvThr[1]: " << oscRecvThr[1] << endl;
         }
     }
     
     if (key == 'k') {
-        if (oscRecvThr[1] >= 0.02){
-            oscRecvThr[1]-=0.02;
+        if (oscRecvThr[1] >= 0.01){
+            oscRecvThr[1]-=0.01;
             cout << "oscRecvThr[1]: " << oscRecvThr[1] << endl;
         }
     }
     
     if (key == 'i') {
         if (oscRecvThr[0] <= 0.98){
-            oscRecvThr[0]+=0.02;
+            oscRecvThr[0]+=0.01;
             cout << "oscRecvThr[0]: " << oscRecvThr[0] << endl;
         }
     }
     
     if (key == 'j') {
-        if (oscRecvThr[0] >= 0.02){
-            oscRecvThr[0]-=0.02;
+        if (oscRecvThr[0] >= 0.01){
+            oscRecvThr[0]-=0.01;
             cout << "oscRecvThr[0]: " << oscRecvThr[0] << endl;
         }
     }
@@ -399,12 +419,20 @@ void ofApp::keyPressed(int key){
     /* erase */
     if (key == 'r') {
          for (vector<Ball*>::iterator it = balls.begin(); it != balls.end(); it++) {
-             oscRecvThr[0] = 1;
-             oscRecvThr[1] = 1;
-             oscRecvThr[2] = 1;
+//             oscRecvThr[0] = 1;
+//             oscRecvThr[1] = 1;
+//             oscRecvThr[2] = 1;
              
-            (*it)->eraseText(100);
+//            (*it)->eraseText(100);
+             
         }
+        
+        int lastIdx = balls.size() - 1;
+        if (lastIdx >= 0) {
+            delete balls[lastIdx];
+            balls.pop_back();
+        }
+        
     }
     
 }

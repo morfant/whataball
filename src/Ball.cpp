@@ -14,6 +14,8 @@
 Ball::Ball(ofxBox2d* w, float x, float y, float r, bool isSuper)
 {
    
+    textColor = 0xffffff;
+    
     mWorld = w;
     radius[0] = RAD;
     radius[1] = (RAD - 60);
@@ -46,6 +48,9 @@ Ball::Ball(ofxBox2d* w, float x, float y, float r, bool isSuper)
 
 Ball::~Ball()
 {
+    mBody->destroy();
+    cout << "destroy mbody" << endl;
+//    delete this
     
 }
 
@@ -184,6 +189,8 @@ void
 Ball::draw()
 {
     
+    ofSetHexColor(textColor);
+    
     mBody->draw();
 
     ofPushMatrix();
@@ -197,9 +204,8 @@ Ball::draw()
 
     for (int i = 0; i < stringArr.size(); i++){
         
-        //text color
-//        ofSetHexColor(0x444342);
-        ofSetHexColor(0xffffff);
+    //text color
+        
         ofDrawBitmapString(stringArr[i], posArr[i].x - cx, posArr[i].y - cy);
 //            ofDrawCircle(posArr[i].x - cx, posArr[i].y - cy, 2);
     }
@@ -259,3 +265,13 @@ Ball::eraseText(float interval)
 }
 
 
+void
+Ball::setGray(bool g){
+    colorGray = g;
+}
+
+
+void
+Ball::setColor(float c) {
+    textColor = c;
+}
